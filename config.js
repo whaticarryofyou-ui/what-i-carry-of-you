@@ -7,7 +7,7 @@
                 t'arribi directament al correu. Si el deixes buit, la gent veurà el teu correu.
 */
 window.SITE = {
-  url: "https://whaticarryofyou.com/",
+  url: "https://what-i-carry-of-you.what-i-carry-of-you.workers.dev/",
   email: "what.i.carry.of.you@gmail.com",
   formEndpoint: ""
 };
