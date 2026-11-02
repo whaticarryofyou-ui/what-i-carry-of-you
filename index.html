@@ -115,6 +115,10 @@ a.lcard:hover .meta{color:var(--stone)}
 .dark p{margin:0;max-width:52ch;color:#E3D8CC}
 .dark small{color:#BCAE9F;font-size:15px;line-height:1.5;display:block}
 .mail{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.igbox{display:flex;gap:14px;flex-wrap:wrap;align-items:center;border-top:1px solid rgba(246,241,234,.16);padding-top:18px;margin-top:6px}
+.igbox p{margin:0}
+.igbox a{color:var(--ivory);text-decoration:none;font-family:var(--ui);font-size:clamp(17px,2.2vw,20px);letter-spacing:.02em;border-bottom:1px solid rgba(246,241,234,.4);padding-bottom:2px}
+.igbox a:hover{color:var(--rose-hi);border-bottom-color:var(--rose-hi)}
 .mail code{font-family:var(--ui);font-size:clamp(18px,2.6vw,24px);letter-spacing:.02em;user-select:all;overflow-wrap:anywhere}
 .ok{font-family:var(--ui);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--rose)}
 .dark .ok{color:var(--rose-hi)}
@@ -306,6 +310,7 @@ footer .eyebrow{font-size:10.5px}
       <h2 id="mailH" style="font-family:var(--display);font-weight:400;font-size:clamp(30px,4.6vw,44px);line-height:1.08;margin:0">If a letter found you, I'd love to know.</h2>
       <p>Tell me who it made you think of. Who you gave it to. What it woke up in you. Or who you wish a letter could reach. I read every word, slowly.</p>
       <div class="mail" id="mailRow"></div>
+      <div class="igbox" id="igBox" hidden></div>
     </section>
 
     <section class="dark ownerbox" id="ownerBox" hidden aria-labelledby="ownerH">
@@ -620,6 +625,13 @@ function renderHome(){
     row.appendChild(b); row.appendChild(ok);
   } else {
     row.appendChild(el("small", null, "My letterbox opens very soon."));
+  }
+  var igh = (SITE.instagram || "").replace(/^@/, "").trim(), igb = $("igBox");
+  if (igh && igb){
+    igb.textContent = "";
+    igb.appendChild(el("p", null, "Or find the letters on Instagram, where a few words arrive each week:"));
+    var ia = el("a", null, "@" + igh); ia.href = "https://instagram.com/" + encodeURIComponent(igh); ia.target = "_blank"; ia.rel = "noopener";
+    igb.appendChild(ia); igb.hidden = false;
   }
   paintSky();
 }
