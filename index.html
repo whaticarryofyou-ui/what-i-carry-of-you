@@ -104,12 +104,14 @@ a.lcard:hover .meta{color:var(--stone)}
 @media (max-width:560px){.letters{grid-template-columns:1fr}}
 .dark{background:var(--esp);color:var(--ivory);padding:clamp(28px,5vw,48px);display:grid;gap:18px}
 .dark .eyebrow{color:var(--stone)}
-.heartbig{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap}
-.heartbig .num{font-family:var(--display);font-size:clamp(84px,14vw,160px);line-height:.85;letter-spacing:-.04em}
-.heartbig .unit{font-family:var(--display);font-style:italic;font-size:clamp(24px,3.4vw,34px);color:var(--rose-hi)}
-.allsky{display:block;width:100%;height:auto;max-width:100%}
-.allsky circle{fill:var(--ivory)}
-.allsky circle.w{fill:var(--rose-hi)}
+.skybox{position:relative;overflow:hidden;background:radial-gradient(90% 90% at 70% 20%,var(--sky1) 0%,var(--sky2) 50%,var(--sky3) 90%);color:var(--ivory);min-height:380px;display:grid;align-items:end;padding:clamp(36px,6vw,64px) clamp(24px,5vw,52px)}
+.skybox canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.skybox .inner{position:relative;display:grid;gap:14px;max-width:34rem}
+.skybox .eyebrow{color:var(--stone)}
+.skyline{margin:0;font-family:var(--display);font-size:clamp(28px,4.2vw,42px);line-height:1.18;letter-spacing:-.01em;text-wrap:balance}
+.skyline em{font-style:italic;color:var(--rose-hi)}
+.skysub{margin:0;color:var(--skytxt);font-size:17px;line-height:1.6;max-width:46ch}
+.skycount{font-family:var(--ui);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose-hi)}
 .dark p{margin:0;max-width:52ch;color:#E3D8CC}
 .dark small{color:#BCAE9F;font-size:15px;line-height:1.5;display:block}
 .mail{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:6px}
@@ -289,12 +291,14 @@ footer .eyebrow{font-size:10.5px}
       <div class="letters" id="lettersList"></div>
     </section>
 
-    <section class="dark" aria-labelledby="starsH">
-      <span class="eyebrow">The sky of every letter</span>
-      <div class="heartbig"><span class="num" id="starNum">✦</span><span class="unit" id="starUnit">stars, each one a letter given with love</span></div>
-      <svg class="allsky" id="allSvg" viewBox="0 0 1000 220" aria-hidden="true"></svg>
-      <p id="starsH">Every time a letter goes from one person to another, a small light appears. This is the sky they're drawing together, quietly, one person at a time.</p>
-      <small id="starNote">Every letter draws its own sky. Open one, and you'll see it.</small>
+    <section class="skybox" aria-labelledby="starsH">
+      <canvas class="skyc" id="boxSkyCv" aria-hidden="true"></canvas>
+      <div class="inner">
+        <span class="eyebrow">The sky of every letter</span>
+        <p class="skyline" id="starsH">Every time a letter goes from one person to another, <em>a small light appears.</em></p>
+        <p class="skysub">This is the sky they're drawing together, quietly, one person at a time. Every letter draws its own. Open one, and you'll see it.</p>
+        <span class="skycount" id="starCount" hidden></span>
+      </div>
     </section>
 
     <section class="dark" id="contact" aria-labelledby="mailH">
@@ -530,8 +534,9 @@ function makeSky(cv, seed, opts){
   skies.push(api); return api;
 }
 var homeSky = makeSky(document.querySelector("#homeView .skyc"), 11, { shooting: true });
+var boxSky = makeSky($("boxSkyCv"), 29, { shooting: true });
 var letterSky = makeSky(document.querySelector("#letterView .skyc"), 7);
-var rsz = 0; addEventListener("resize", function(){ clearTimeout(rsz); rsz = setTimeout(function(){ (route === "home" ? homeSky : letterSky).start(); }, 200); });
+var rsz = 0; addEventListener("resize", function(){ clearTimeout(rsz); rsz = setTimeout(function(){ if (route === "home"){ homeSky.start(); boxSky.start(); } else letterSky.start(); }, 200); });
 
 // ---- wordless constellation
 function walk(seeds){
@@ -566,21 +571,9 @@ function drawStars(svg, pts, linked, youLast){
 var db = null, uid = null, skyDocs = {}, isOwner = false;
 function skyTotals(){ var all = 0, l01 = 0; Object.keys(skyDocs).forEach(function(k){ var d = skyDocs[k] || {}; Object.keys(d).forEach(function(key){ var v = d[key]; if (v && typeof v === "object"){ all++; if (v.l === "01") l01++; } }); }); return { all: all, l01: l01 }; }
 function paintSky(){
-  var t = skyTotals(), svg = $("allSvg");
-  if (db){
-    $("starNum").textContent = t.all; $("starUnit").textContent = t.all === 1 ? "star, a letter given with love" : "stars, each one a letter given with love";
-    
-  } else { $("starNum").textContent = "✦"; $("starUnit").textContent = "stars, each one a letter given with love"; }
-  svg.textContent = "";
-  var n = Math.min(db ? t.all : 0, 400), x = 2463534242;
-  var r = function(){ x ^= x << 13; x >>>= 0; x ^= x >>> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; };
-  for (var i = 0; i < 60 + n; i++){
-    var c = document.createElementNS(NS, "circle"), lit = i >= 60;
-    c.setAttribute("cx", (r() * 980 + 10).toFixed(1)); c.setAttribute("cy", (r() * 200 + 10).toFixed(1));
-    c.setAttribute("r", lit ? (2.2 + r() * 1.6).toFixed(2) : (.6 + r() * .8).toFixed(2));
-    if (lit) { if (r() < .3) c.setAttribute("class", "w"); } else c.setAttribute("opacity", (.25 + r() * .3).toFixed(2));
-    svg.appendChild(c);
-  }
+  var t = skyTotals(), c = $("starCount");
+  if (db && t.all){ c.textContent = "✦ " + t.all + (t.all === 1 ? " light so far" : " lights so far"); c.hidden = false; }
+  else c.hidden = true;
 }
 async function initSky(){
   paintSky();
@@ -968,10 +961,10 @@ async function go(){
   var isCopy = /^[cu][0-9a-z]{8,}$/.test(h), m = /^letter-([0-9a-z-]+)$/i.exec(h);
   if ((m && findLetter(m[1])) || isCopy){
     route = "letter"; $("homeView").hidden = true; $("letterView").hidden = false;
-    homeSky.stop(); await showLetter(isCopy ? h : "", m ? m[1] : ""); letterSky.start(7 + state.n);
+    homeSky.stop(); boxSky.stop(); await showLetter(isCopy ? h : "", m ? m[1] : ""); letterSky.start(7 + state.n);
   } else {
     route = "home"; $("letterView").hidden = true; $("homeView").hidden = false;
-    letterSky.stop(); renderHome(); homeSky.start(11);
+    letterSky.stop(); renderHome(); homeSky.start(11); boxSky.start(29);
     if (h && $(h)) { $(h).scrollIntoView({ behavior: "auto" }); return; }
   }
   scrollTo(0, 0);
