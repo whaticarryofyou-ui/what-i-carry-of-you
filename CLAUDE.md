@@ -12,3 +12,6 @@ Append a new object to `window.LETTERS` with the next `id` ("02", "03"…). Keep
 
 ## Voice
 All copy is in English, written with great care and tenderness: short sentences, gentle repetition, nothing technical ("person", "words", "give", never "copy", "link", "hand number"). Passing a letter is anonymous and words are optional. The signature is "Clàudia" with a star as the dot of the i.
+
+## Publishing
+Every push to `main` deploys automatically through Cloudflare (a few minutes). `_headers` tells browsers to revalidate files. When `config.js` or `letters.js` change, bump the `?v=` on their `<script>` tags in `index.html` so returning visitors get the new version.
