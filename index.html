@@ -255,6 +255,7 @@ footer .eyebrow{font-size:10.5px}
       <span class="eyebrow">Letters by Clàudia</span>
       <h1 id="homeH1">What I carry <em>of you</em></h1>
       <p class="lead">Letters for the people we carry inside. The ones who are close, the ones who are far, the ones who made us who we are. You read each letter only once. And it keeps living every time you give it to someone who matters to you.</p>
+      <p class="lead" style="font-size:16px;margin-top:4px">You don't need to wait for someone to give it to you. It's here for you now.</p>
       <div class="btns"><a class="cta fill latest-link" href="#letter-01" id="heroLatest">Open the letter <i>→</i></a><a class="cta" href="#how">How a letter travels</a></div>
       <div class="constel"><svg id="homeSvg" viewBox="0 0 1000 380" aria-hidden="true"></svg></div>
       <div class="skycap"><span>Each person who gives a letter to someone they love becomes a star</span><span id="homeCap"></span></div>
@@ -410,6 +411,7 @@ footer .eyebrow{font-size:10.5px}
 
 <footer class="wrap">
   <span class="eyebrow">What I carry of you · Clàudia</span>
+  <span id="igRow" hidden></span>
   <span>Each letter carries its own path inside it, wherever it goes. The only words kept are the ones written back to Clàudia, and only she reads them.</span>
 </footer>
 
@@ -631,9 +633,9 @@ function renderEnvelope(){
     f.appendChild(el("span", "to", "For you"));
     $("rule").textContent = (state.n === 1 ? "One person held it before you, and chose to give it to you." : state.n + " people held it before you, each one choosing who came next.") + " Now it's in your hands, the newest star in its sky.";
   } else {
-    f.appendChild(el("span", "eyebrow", "From where it all began"));
+    f.appendChild(el("span", "eyebrow", "It found its own way to you"));
     f.appendChild(el("q", "plain", "A letter from Clàudia"));
-    $("rule").textContent = "You're the very first to hold it. Its sky begins with you.";
+    $("rule").textContent = "No one had to give it to you. Sometimes a letter simply finds the person who needs it. This copy is yours, and its sky begins with you.";
   }
 }
 function renderHands(){
@@ -942,6 +944,7 @@ async function initOwnerBox(){
 var route = "home";
 async function go(){
   var h = (location.hash || "").replace(/^#/, "");
+  if (h === "read") h = "letter-" + LETTERS[LETTERS.length - 1].id;
   var isCopy = /^[cu][0-9a-z]{8,}$/.test(h), m = /^letter-([0-9a-z-]+)$/i.exec(h);
   if ((m && findLetter(m[1])) || isCopy){
     route = "letter"; $("homeView").hidden = true; $("letterView").hidden = false;
@@ -953,6 +956,11 @@ async function go(){
   }
   scrollTo(0, 0);
 }
+(function(){
+  var ig = (SITE.instagram || "").replace(/^@/, "").trim(); if (!ig) return;
+  var a = el("a", null, "Follow the letters on Instagram · @" + ig); a.href = "https://instagram.com/" + encodeURIComponent(ig); a.target = "_blank"; a.rel = "noopener";
+  a.style.color = "var(--rose)"; $("igRow").appendChild(a); $("igRow").hidden = false;
+})();
 $("seal").addEventListener("click", openLetter);
 $("doneBtn").addEventListener("click", startFade);
 $("passBtn").addEventListener("click", doPass);
