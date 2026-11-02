@@ -14,5 +14,5 @@ window.SITE = {
   url: "https://what-i-carry-of-you.what-i-carry-of-you.workers.dev/",
   email: "what.i.carry.of.you@gmail.com",
   formEndpoint: "",
-  instagram: ""
+  instagram: "whaticarryofyou_letters"
 };
